@@ -11,5 +11,8 @@
   },
   "bin": {
     "proxify": "./proxify"
+  },
+  "dependencies": {
+    "optimist": "^0.6.1"
   }
 }
