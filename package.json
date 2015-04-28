@@ -1,0 +1,15 @@
+{
+  "name": "proxify",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "main": "proxify",
+  "author": "Jon Suderman",
+  "preferGlobal": true,
+  "scripts": {
+    "start": "node ./proxify"
+  },
+  "bin": {
+    "proxify": "./proxify"
+  }
+}
