@@ -6,15 +6,15 @@
   "main": "proxify",
   "author": "Jon Suderman",
   "preferGlobal": true,
+  "bin": "./bin/proxify",
   "scripts": {
-    "start": "node ./proxify"
-  },
-  "bin": {
-    "proxify": "./proxify"
+    "start": "node ./bin/proxify"
   },
   "dependencies": {
+    "babel": "^5.1.13",
     "colors": "^1.1.0",
     "lodash": "^3.7.0",
+    "mustache": "^2.0.0",
     "shelljs": "^0.4.0",
     "sync-request": "^2.0.1",
     "yargs": "^3.8.0"
