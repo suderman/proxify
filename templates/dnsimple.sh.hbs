@@ -1,0 +1,9 @@
+curl  -H "X-DNSimple-Token: {{{dnsimple}}}" \
+      -H 'Accept: application/json' \
+      -H 'Content-Type: application/json' \
+      -X POST \
+      -d "{ \"record\": { \"name\": \"{{{subdomain}}}\", \"record_type\": \"ALIAS\", \"content\": \"{{{router}}}\", \"ttl\": 600 } }" \
+      https://api.dnsimple.com/v1/domains/{{{domain}}}/records \
+      -s > /dev/null
+
+echo "{{{subdomain}}}.{{{domain}}} -> {{{router}}}"
