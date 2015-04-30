@@ -13,6 +13,10 @@
     "proxify": "./proxify"
   },
   "dependencies": {
-    "optimist": "^0.6.1"
+    "colors": "^1.1.0",
+    "lodash": "^3.7.0",
+    "shelljs": "^0.4.0",
+    "sync-request": "^2.0.1",
+    "yargs": "^3.8.0"
   }
 }
