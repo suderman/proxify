@@ -17,3 +17,6 @@ Options:
   -h, --help      Show help
 ```
 
+## Installation  
+
+`sudo npm install suderman/proxify`  
