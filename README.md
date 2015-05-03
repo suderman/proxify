@@ -19,4 +19,4 @@ Options:
 
 ## Installation  
 
-`sudo npm install suderman/proxify`  
+`npm install -g suderman/proxify`  
