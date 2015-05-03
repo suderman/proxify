@@ -1,5 +1,3 @@
-'use strict';
-
 var fs = require('fs'),
     path = require('path'),
     hbs = require('handlebars'),
@@ -13,8 +11,9 @@ try {
   templates.nginx = hbs.compile(fs.readFileSync(dir + '/nginx.conf.hbs', 'utf8'));
   templates.dnsmasq = hbs.compile(fs.readFileSync(dir + '/dnsmasq.conf.hbs', 'utf8'));
   templates.dnsimple = hbs.compile(fs.readFileSync(dir + '/dnsimple.sh.hbs', 'utf8'));
+
 } catch (e) {
-  console.log('Error reading templates!'.red);
+  console.log((`Error reading templates!`).red);
   process.exit(1);
 }
 

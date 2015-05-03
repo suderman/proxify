@@ -1,11 +1,9 @@
-'use strict';
-
 var _ = require('lodash'),
     fs = require('fs'),
     request = require('sync-request');
 
 // Save data (or data from URL) to path
-module.exports = function (path, data) {
+module.exports = function(path, data) {
 
   // If data empty, exit
   if (!_.trim(data)) return;
@@ -14,16 +12,16 @@ module.exports = function (path, data) {
   try {
     fs.readFileSync(path, 'utf8');
 
-    // Otherwise, go for it
+  // Otherwise, go for it
   } catch (e) {
 
     // Check if the data looks like a URL
-    if (_.startsWith(data, 'http://') || _.startsWith(data, 'https://')) {
+    if ((_.startsWith(data, 'http://')) || (_.startsWith(data, 'https://'))) {
 
       // If so, download the URL and set data
       var url = data;
       data = request('GET', url).getBody('utf8');
-    }
+    } 
 
     // Write the data to the path
     fs.writeFileSync(path, data);
@@ -34,8 +32,8 @@ module.exports = function (path, data) {
     }
 
     // Protect key and pem files
-    if (_.endsWith(path, '.key') || _.endsWith(path, '.pem')) {
+    if ((_.endsWith(path, '.key')) || (_.endsWith(path, '.pem'))) {
       fs.chmodSync(path, '600');
     }
   }
-};
+}
