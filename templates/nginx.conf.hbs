@@ -10,7 +10,10 @@ server {
     ~/CN=(?<CN>[^/]+) $CN;
   }
 
-  listen {{{listen}}};
+  {{#each listen}}
+  listen {{{this}}};
+  {{/each}}
+
   server_name {{{name}}}{{#if subdomain}} {{{subdomain}}}.lan{{/if}};
 
   {{#if ssl}}

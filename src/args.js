@@ -48,7 +48,9 @@ module.exports = function(command) {
   if (_.endsWith(args.target, '.')) args.target += args.domain; 
 
   // Ensure listen port doesn't start with :colon
-  if (_.startsWith(args.listen, ':')) args.listen = args.listen.split(':')[1];
+  args.listen = _.map(args.listen.split(','), function(port) {
+    return (_.startsWith(port, ':')) ? port.split(':')[1] : port;
+  });
 
   if (args.target) {
 

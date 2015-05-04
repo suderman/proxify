@@ -29,7 +29,7 @@ _.forEach(commands, function(command) {
 
   var args = require('./args')(command);
   files.name.push(args.name);
-  files.name.push(args.listen);
+  files.name.push(args.listen.toString());
 
   // dnsimple subdomain alias bash script
   if ((args.domain) && (args.subdomain) && (args.router) && (args.dnsimple)) {
