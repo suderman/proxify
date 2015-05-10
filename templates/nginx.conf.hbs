@@ -1,14 +1,12 @@
-server {
-  gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+# Extract the client certificate's common name
+map $ssl_client_s_dn  $ssl_client_s_dn_cn {
+  default           "";
+  ~/CN=(?<CN>[^/]+) $CN;
+}
 
+server {
   resolver         8.8.8.8 8.8.4.4 valid=300s;
   resolver_timeout 5s;
-
-  # Extract the client certificate's common name
-  map $ssl_client_s_dn  $ssl_client_s_dn_cn {
-    default           "";
-    ~/CN=(?<CN>[^/]+) $CN;
-  }
 
   {{#each listen}}
   listen {{{this}}};
