@@ -4,6 +4,7 @@ var _ = require('lodash'),
     request = require('sync-request'),
     hbs = require('handlebars'),
     colors = require('colors');
+require('shelljs/global');
 
 var commands = [];
 var argv = require('yargs').boolean(['s','p','a','r']).argv;
@@ -22,7 +23,7 @@ try {
 
 // Pull up templates
 var templates = require('./templates');
-var files = { name: [], dnsimple: [], dnsmasq: [], nginx: [], cert: {} }
+var files = { name: [], dnsimple: [], dnsmasq: [], nginx: [], cert: {}, login: {} }
 
 // Loop all commands
 _.forEach(commands, function(command) {
@@ -60,9 +61,9 @@ _.forEach(commands, function(command) {
       subdomain:  args.subdomain,
       redirect:   args.redirect,
       auth:       args.auth,
-      password:   args.password,
+      pass:       args.pass,
       ssl:        args.ssl
-    }));
+    }).replace(/^\s*[\r\n]/gm, ''));
   }
   
   // Prepare to download certificate information
@@ -76,6 +77,11 @@ _.forEach(commands, function(command) {
     // Download CA certificate and CRL
     files.cert[`${dir}/ca.crt`]           = `${args.ca}/ca.crt`;
     files.cert[`${dir}/ca.crl`]           = `${args.ca}/ca.crl`;
+  }
+
+  // Prepare credentials for htpasswd file
+  if ((args.loginName) && (args.loginPass) && (args.pass)) {
+    files.login[args.loginName] = _.trim(exec(`openssl passwd -apr1 ${args.loginPass}`, {silent:true}).output);
   }
 
 });
@@ -105,3 +111,10 @@ save(filename, data);
 _.forEach(files.cert, function(url, filename) {
   save(filename, url);
 });
+
+// Save htpasswd file
+if (_.values(files.login).length) {
+  filename = `${dir}/htaccess`;
+  data = _.map(files.login, (pass, name) => `${name}:${pass}`);
+  save(filename, data.join("\n"));
+}
