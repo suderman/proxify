@@ -36,13 +36,13 @@ http {
 
   # Allow big files
   client_max_body_size 9999M;
-                                                     
+
   # Extract the client certificate's common name
   map  $ssl_client_s_dn  $ssl_client_s_dn_cn {
     default           "";
     ~/CN=(?<CN>[^/]+) $CN;
   }
 
-  # Virtual Hosts
+  # Virtual Hosts and other configuration
   include {{{output}}}/*.nginx.conf;
 }
