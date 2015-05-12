@@ -1,12 +1,7 @@
-# Extract the client certificate's common name
-map $ssl_client_s_dn  $ssl_client_s_dn_cn {
-  default           "";
-  ~/CN=(?<CN>[^/]+) $CN;
-}
-
+#
+# {{{name}}}
+#
 server {
-  resolver         8.8.8.8 8.8.4.4 valid=300s;
-  resolver_timeout 5s;
 
   {{#each listen}}
   listen {{{this}}};
@@ -15,85 +10,83 @@ server {
   server_name {{{name}}}{{#if subdomain}} {{{subdomain}}}.lan{{/if}};
 
   {{#if ssl}}
-    ssl on;
+  ssl on;
 
-    ssl_certificate         {{{name}}}.pem;
-    ssl_certificate_key     {{{name}}}.key;
+  ssl_certificate         {{{output}}}/{{{name}}}.pem;
+  ssl_certificate_key     {{{output}}}/{{{name}}}.key;
 
-    ssl_trusted_certificate ca.crt;
-    ssl_client_certificate  ca.crt;
-    ssl_crl                 ca.crl;
+  ssl_trusted_certificate {{{output}}}/ca.crt;
+  ssl_client_certificate  {{{output}}}/ca.crt;
+  ssl_crl                 {{{output}}}/ca.crl;
 
-    ssl_session_cache       shared:SSL:5m;
-    ssl_session_timeout     5m;
+  ssl_session_cache       shared:SSL:5m;
+  ssl_session_timeout     5m;
 
-    ssl_stapling            on;
-    ssl_stapling_verify     on;
+  ssl_stapling            on;
+  ssl_stapling_verify     on;
   {{/if}}
 
   {{#if auth}}
-    # Client certificate authentication
-    set $authorized_common_name {{{domain}}};
-    set $unauthorized_redirect http://error.{{{domain}}}/403.html;
+  # Client certificate authentication
+  set $authorized_common_name {{{domain}}};
+  set $unauthorized_redirect http://error.{{{domain}}}/403.html;
 
-    # Ask for certificate
-    ssl_verify_client optional;
-    ssl_verify_depth  1;
+  # Ask for certificate
+  ssl_verify_client optional;
+  ssl_verify_depth  1;
 
-    # Default to unauthenticated
+  # Default to unauthenticated
+  set $authenticated FALSE;
+
+  # Ensure common name includes valid option
+  set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
+  if ($authentication_check ~ "([^:]+):\1") {
+    set $authenticated TRUE;
+  }
+
+  # Ensure client has certificate
+  if ($ssl_client_verify = NONE) {
     set $authenticated FALSE;
+  }
 
-    # Ensure common name includes valid option
-    set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
-    if ($authentication_check ~ "([^:]+):\1") {
-      set $authenticated TRUE;
-    }
-
-    # Ensure client has certificate
-    if ($ssl_client_verify = NONE) {
-      set $authenticated FALSE;
-    }
-
-    # Redirect trespassers
-    if ($authenticated = FALSE) {
-      return 303 $unauthorized_redirect;
-    }
+  # Redirect trespassers
+  if ($authenticated = FALSE) {
+    return 303 $unauthorized_redirect;
+  }
   {{/if}}
 
   {{#if redirect}}
-    rewrite ^ {{{target}}} permanent;
+  rewrite ^ {{{target}}} permanent;
 
   {{else}}
 
-    location / {
+  location / {
 
-      {{#if directory}}
-        autoindex on;
-        alias {{{directory}}};
+    {{#if directory}}
+    autoindex on;
+    alias {{{directory}}};
 
-      {{else}}
-        client_max_body_size 9999M;
-        proxy_pass {{{target}}};
+    {{else}}
+    proxy_pass {{{target}}};
 
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-SSL-Client-Serial $ssl_client_serial;
-        proxy_set_header X-SSL-Client-Verify $ssl_client_verify;
-        proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
-        proxy_set_header X-SSL-Client-S-CN $ssl_client_s_dn_cn;
-      {{/if}}
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-SSL-Client-Serial $ssl_client_serial;
+    proxy_set_header X-SSL-Client-Verify $ssl_client_verify;
+    proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
+    proxy_set_header X-SSL-Client-S-CN $ssl_client_s_dn_cn;
+    {{/if}}
 
-      {{#if pass}}
-        auth_basic "Restricted";
-        auth_basic_user_file htpasswd;
-      {{/if}}
-    }
+    {{#if pass}}
+    auth_basic "Restricted";
+    auth_basic_user_file {{{output}}}/htpasswd;
+    {{/if}}
+  }
 
   {{/if}}
 }
-
