@@ -1,5 +1,6 @@
 var _ = require('lodash'),
     fs = require('fs'),
+    dirname = require("path").dirname,
     colors = require('colors'),
     request = require('sync-request');
 require('shelljs/global');
@@ -26,6 +27,9 @@ function save(path, data, options) {
   } else {
     data = data.replace(blankLines, '');
   } 
+
+  // Ensure directory exists
+  mkdir('-p', dirname(path));
 
   // Write the data to the path
   fs.writeFileSync(path, data);

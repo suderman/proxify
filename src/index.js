@@ -45,6 +45,13 @@ _.forEach(commands, function(command) {
     }));
   }
 
+  // dnsimple main bash script
+  if ((args.output)) {
+    files.main.dnsimple = templates.main.dnsimple({
+      output:   args.output
+    });
+  }
+
   // dnsmasq sites configuration
   if ((args.name) && (args.server)) {
     files.dnsmasq.push(templates.dnsmasq({
@@ -114,14 +121,14 @@ var id = [files.name[0], crypto.createHash('sha1').update(files.name.toString())
     options = { user: files.user[0], force: files.force[0] },
     filename, data, url;
 
-// Save dnsimple shell script
-filename = `${output}/${id}.dnsimple.sh`;
-data = _.uniq(files.dnsimple).join("\n");
+// Save main dnsimple configuration
+filename = `${output}/dnsimple.sh`;
+data = files.main.dnsimple;
 save(filename, data, options);
 
-// Save dnsmasq configuration
-filename = `${output}/${id}.dnsmasq.conf`;
-data = _.uniq(files.dnsmasq).join("\n");
+// Save dnsimple shell script
+filename = `${output}/dnsimple/${id}.dnsimple.sh`;
+data = _.uniq(files.dnsimple).join("\n");
 save(filename, data, options);
 
 // Save main dnsmasq configuration
@@ -129,9 +136,9 @@ filename = `${output}/dnsmasq.conf`;
 data = files.main.dnsmasq;
 save(filename, data, options);
 
-// Save nginx configuration
-filename = `${output}/${id}.nginx.conf`;
-data = _.uniq(files.nginx).join("\n");
+// Save dnsmasq configuration
+filename = `${output}/dnsmasq/${id}.dnsmasq.conf`;
+data = _.uniq(files.dnsmasq).join("\n");
 save(filename, data, options);
 
 // Save main nginx configuration
@@ -139,15 +146,30 @@ filename = `${output}/nginx.conf`;
 data = files.main.nginx;
 save(filename, data, options);
 
+// Save nginx configuration
+filename = `${output}/nginx/${id}.nginx.conf`;
+data = _.uniq(files.nginx).join("\n");
+save(filename, data, options);
+
 // Download certificates
 _.forEach(files.cert, function(url, filename) {
-  filename = `${output}/${filename}`;
+  filename = `${output}/certs/${filename}`;
   save(filename, url, options);
 });
 
-// Save htpasswd file
+// Save .htpasswd file
 if (_.values(files.login).length) {
-  filename = `${output}/htpasswd`;
+  filename = `${output}/nginx/.htpasswd`;
   data = _.map(files.login, (pass, name) => `${name}:${pass}`);
   save(filename, data.join("\n"), options);
+}
+
+// Ensure log files exist
+mkdir('-p', `${output}/log`);
+exec(`touch ${output}/log/dnsmasq.log`, { silent: true });
+exec(`touch ${output}/log/nginx.access.log`, { silent: true });
+exec(`touch ${output}/log/nginx.error.log`, { silent: true });
+if (options.user) {
+  exec(`chown -R ${options.user} ${output}/log`, { silent: true });
+  exec(`chgrp -R ${options.user} ${output}/log`, { silent: true });
 }

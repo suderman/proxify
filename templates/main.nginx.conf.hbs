@@ -22,8 +22,8 @@ http {
   ssl_prefer_server_ciphers on;
                                                                           
   # Logging Settings
-  access_log {{{output}}}/nginx.access.log;
-  error_log {{{output}}}/nginx.error.log;
+  access_log {{{output}}}/log/nginx.access.log;
+  error_log {{{output}}}/log/nginx.error.log;
 
   # Gzip Settings
   gzip on;
@@ -44,5 +44,5 @@ http {
   }
 
   # Virtual Hosts and other configuration
-  include {{{output}}}/*.nginx.conf;
+  include {{{output}}}/nginx/*.conf;
 }

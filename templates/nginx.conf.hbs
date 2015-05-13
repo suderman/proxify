@@ -12,12 +12,12 @@ server {
   {{#if ssl}}
   ssl on;
 
-  ssl_certificate         {{{output}}}/{{{name}}}.pem;
-  ssl_certificate_key     {{{output}}}/{{{name}}}.key;
+  ssl_certificate         {{{output}}}/certs/{{{name}}}.pem;
+  ssl_certificate_key     {{{output}}}/certs/{{{name}}}.key;
 
-  ssl_trusted_certificate {{{output}}}/ca.crt;
-  ssl_client_certificate  {{{output}}}/ca.crt;
-  ssl_crl                 {{{output}}}/ca.crl;
+  ssl_trusted_certificate {{{output}}}/certs/ca.crt;
+  ssl_client_certificate  {{{output}}}/certs/ca.crt;
+  ssl_crl                 {{{output}}}/certs/ca.crl;
 
   ssl_session_cache       shared:SSL:5m;
   ssl_session_timeout     5m;
@@ -84,7 +84,7 @@ server {
 
     {{#if pass}}
     auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/htpasswd;
+    auth_basic_user_file {{{output}}}/nginx/.htpasswd;
     {{/if}}
   }
 

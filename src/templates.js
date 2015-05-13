@@ -12,6 +12,7 @@ try {
   templates.nginx = hbs.compile(fs.readFileSync(dir + '/nginx.conf.hbs', 'utf8'));
   templates.main.dnsmasq = hbs.compile(fs.readFileSync(dir + '/main.dnsmasq.conf.hbs', 'utf8'));
   templates.dnsmasq = hbs.compile(fs.readFileSync(dir + '/dnsmasq.conf.hbs', 'utf8'));
+  templates.main.dnsimple = hbs.compile(fs.readFileSync(dir + '/main.dnsimple.sh.hbs', 'utf8'));
   templates.dnsimple = hbs.compile(fs.readFileSync(dir + '/dnsimple.sh.hbs', 'utf8'));
 
 } catch (e) {
