@@ -104,7 +104,7 @@ _.forEach(commands, function(command) {
 
     // Download CA certificate and CRL
     files.cert[`ca.crt`]           = `${args.ca}/ca.crt`;
-    files.cert[`ca.crl`]           = `${args.ca}/ca.crl`;
+    files.cert[`ca.crl`]           = `${args.ca}/ca.crl.pem`;
   }
 
   // Prepare credentials for htpasswd file
