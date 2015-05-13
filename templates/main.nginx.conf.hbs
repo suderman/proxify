@@ -18,8 +18,13 @@ http {
   default_type application/octet-stream;
                                                                           
   # SSL Settings
-  ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+  ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
   ssl_prefer_server_ciphers on;
+  ssl_session_cache         shared:SSL:5m;
+  ssl_session_timeout       5m;
+  ssl_trusted_certificate   {{{output}}}/certs/ca.crt;
+  ssl_client_certificate    {{{output}}}/certs/ca.crt;
+  ssl_crl                   {{{output}}}/certs/ca.crl;
                                                                           
   # Logging Settings
   access_log {{{output}}}/log/nginx.access.log;

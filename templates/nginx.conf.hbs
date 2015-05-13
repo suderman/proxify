@@ -10,20 +10,11 @@ server {
   server_name {{{name}}}{{#if subdomain}} {{{subdomain}}}.lan{{/if}};
 
   {{#if ssl}}
-  ssl on;
-
-  ssl_certificate         {{{output}}}/certs/{{{name}}}.pem;
-  ssl_certificate_key     {{{output}}}/certs/{{{name}}}.key;
-
-  ssl_trusted_certificate {{{output}}}/certs/ca.crt;
-  ssl_client_certificate  {{{output}}}/certs/ca.crt;
-  ssl_crl                 {{{output}}}/certs/ca.crl;
-
-  ssl_session_cache       shared:SSL:5m;
-  ssl_session_timeout     5m;
-
-  ssl_stapling            on;
-  ssl_stapling_verify     on;
+  ssl                 on;
+  ssl_stapling        on;
+  ssl_stapling_verify on;
+  ssl_certificate     {{{output}}}/certs/{{{name}}}.pem;
+  ssl_certificate_key {{{output}}}/certs/{{{name}}}.key;
   {{/if}}
 
   {{#if auth}}
