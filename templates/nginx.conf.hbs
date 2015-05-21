@@ -9,7 +9,7 @@ server {
 
   server_name {{{name}}}{{#if subdomain}} {{{subdomain}}}.lan{{/if}};
 
-  {{#if ssl}}
+  {{#if secure}}
   ssl                 on;
   ssl_stapling        on;
   ssl_stapling_verify on;
@@ -17,11 +17,7 @@ server {
   ssl_certificate_key {{{output}}}/certs/{{{name}}}.key;
   {{/if}}
 
-  {{#if auth}}
-  # Client certificate authentication
-  set $authorized_common_name {{{domain}}};
-  set $unauthorized_redirect http://error.{{{domain}}}/403.html;
-
+  {{#if certify}}
   # Ask for certificate
   ssl_verify_client optional;
   ssl_verify_depth  1;
@@ -29,7 +25,15 @@ server {
   # Default to unauthenticated
   set $authenticated FALSE;
 
-  # Ensure common name includes valid option
+  # Authenticate common names containing @subdomain.domain (site-specific)
+  set $authorized_common_name @{{{subdomain}}}.{{{domain}}};
+  set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
+  if ($authentication_check ~ "([^:]+):\1") {
+    set $authenticated TRUE;
+  }
+
+  # Authenticate common names containing @domain (domain-wide)
+  set $authorized_common_name @{{{domain}}};
   set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
   if ($authentication_check ~ "([^:]+):\1") {
     set $authenticated TRUE;
@@ -42,7 +46,7 @@ server {
 
   # Redirect trespassers
   if ($authenticated = FALSE) {
-    return 303 $unauthorized_redirect;
+    return 303 {{{error}}}/403.html;
   }
   {{/if}}
 
@@ -73,7 +77,8 @@ server {
     proxy_set_header X-SSL-Client-S-CN $ssl_client_s_dn_cn;
     {{/if}}
 
-    {{#if pass}}
+    {{#if htpasswd}}
+    # HTTP Basic Access Authentication
     auth_basic "Restricted";
     auth_basic_user_file {{{output}}}/nginx/.htpasswd;
     {{/if}}

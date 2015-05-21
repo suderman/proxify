@@ -7,7 +7,7 @@ var _ = require('lodash'),
 require('shelljs/global');
 
 var commands = [];
-var argv = require('yargs').boolean(['s','p','a','r']).argv;
+var argv = require('yargs').boolean(['s','a','r']).argv;
 
 try {
   var lines = fs.readFileSync(argv._[0], 'utf8').split("\n");
@@ -55,8 +55,9 @@ _.forEach(commands, function(command) {
   // dnsmasq sites configuration
   if ((args.name) && (args.server)) {
     files.dnsmasq.push(templates.dnsmasq({
-      name:     args.name,
-      server:   args.server
+      name:      args.name,
+      subdomain: args.subdomain,
+      server:    args.server
     }));
   }
 
@@ -73,17 +74,18 @@ _.forEach(commands, function(command) {
   // nginx server block
   if ((args.name) && (args.listen) && (args.target) && (args.output)) {
     files.nginx.push(templates.nginx({
-      name:       args.name,
-      listen:     args.listen,
-      target:     args.target,
-      directory:  args.directory,
-      domain:     args.domain,
-      subdomain:  args.subdomain,
-      redirect:   args.redirect,
-      auth:       args.auth,
-      pass:       args.pass,
-      ssl:        args.ssl,
-      output:     args.output
+      name:         args.name,
+      listen:       args.listen,
+      target:       args.target,
+      directory:    args.directory,
+      domain:       args.domain,
+      subdomain:    args.subdomain,
+      redirect:     args.redirect,
+      error:        args.error,
+      certify:      args.certify,
+      htpasswd:     args.htpasswd,
+      secure:       args.secure,
+      output:       args.output
     }));
   }
 
@@ -91,12 +93,13 @@ _.forEach(commands, function(command) {
   if ((args.user) && (args.output)) {
     files.main.nginx = templates.main.nginx({
       user:     args.user,
+      error:    args.error,
       output:   args.output
     });
   }
   
   // Prepare to download certificate information
-  if ((args.name) && (args.ssl)) {
+  if ((args.name) && (args.secure)) {
 
     // Download certificate and key
     files.cert[`${args.name}.pem`] = `${args.ca}/${args.name}.pem`;
@@ -108,9 +111,9 @@ _.forEach(commands, function(command) {
   }
 
   // Prepare credentials for htpasswd file
-  if ((args.loginName) && (args.loginPass) && (args.pass)) {
-    files.login[args.loginName] = _.trim(exec(`openssl passwd -apr1 ${args.loginPass}`, {silent:true}).output);
-  }
+  _.forEach(args.logins, function(password, username) {
+    files.login[username] = _.trim(exec(`openssl passwd -apr1 ${password}`, {silent:true}).output);
+  });
 
 });
 
