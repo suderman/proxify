@@ -1,9 +1,9 @@
 var _ = require('lodash'),
     fs = require('fs'),
-    crypto = require('crypto'),
     request = require('sync-request'),
     hbs = require('handlebars'),
-    colors = require('colors');
+    colors = require('colors'),
+    save = require('./save');
 require('shelljs/global');
 
 var commands = [];
@@ -23,57 +23,71 @@ try {
 
 // Pull up templates
 var templates = require('./templates');
-var files = { name: [], dnsimple: [], main: {}, dnsmasq: [], nginx: [], cert: {}, login: {}, output: [], user: [], force: [] }
+var files = {}, options = {}, key = '';
 
 // Loop all commands
 _.forEach(commands, function(command) {
-
   var args = require('./args')(command);
-  files.name.push(args.name);
-  files.name.push(args.listen.toString());
-  files.output.push(args.output);
-  files.user.push(args.user);
-  files.force.push(args.force);
 
   // dnsimple subdomain alias bash script
   if ((args.domain) && (args.subdomain) && (args.router) && (args.dnsimple)) {
-    files.dnsimple.push(templates.dnsimple({
+    key = `${args.output}/dnsimple/${args.name}.dnsimple.sh`;
+    files[key] = templates.dnsimple({
       domain:     args.domain,
       subdomain:  args.subdomain,
       router:     args.router,
       dnsimple:   args.dnsimple
-    }));
+    });
+    options[key] = { user: args.user, force: args.force }
   }
 
   // dnsimple main bash script
   if ((args.output)) {
-    files.main.dnsimple = templates.main.dnsimple({
+    key = `${args.output}/dnsimple.sh`;
+    files[key] = templates.main.dnsimple({
       output:   args.output
     });
+    options[key] = { user: args.user, force: args.force }
   }
 
   // dnsmasq sites configuration
   if ((args.name) && (args.server)) {
-    files.dnsmasq.push(templates.dnsmasq({
+    key = `${args.output}/dnsmasq/${args.name}.dnsmasq.conf`;
+    files[key] = templates.dnsmasq({
       name:      args.name,
       subdomain: args.subdomain,
       server:    args.server
-    }));
+    });
+    options[key] = { user: args.user, force: args.force }
   }
 
   // dnsmasq configuration
   if ((args.user) && (args.domain) && (args.server) && (args.output)) {
-    files.main.dnsmasq = templates.main.dnsmasq({
+    key = `${args.output}/dnsmasq.conf`;
+    files[key] = templates.main.dnsmasq({
       user:     args.user,
       domain:   args.domain,
       server:   args.server,
       output:   args.output
     });
+    options[key] = { user: args.user, force: args.force }
+  }
+
+  // htpasswd file
+  if ((args.htpasswd) && (args.logins) && (args.name) && (args.listen)) {
+    key = `${args.output}/htpasswd/${args.name}.${args.listen.join('.')}.htpasswd`;
+    files[key] = _.map(args.logins, function(password, username) {
+      password = _.trim(exec(`openssl passwd -apr1 ${password}`, {silent:true}).output);
+      return `${username}:${password}`;
+    }).join("\n");
+    options[key] = { user: args.user, force: args.force }
   }
 
   // nginx server block
   if ((args.name) && (args.listen) && (args.target) && (args.output)) {
-    files.nginx.push(templates.nginx({
+    key = `${args.output}/nginx/${args.name}.${args.listen.join('.')}.nginx.conf`;
+    files[key] = templates.nginx({
+      id:           `${args.name}.${args.listen.join('.')}`,
       name:         args.name,
       listen:       args.listen,
       target:       args.target,
@@ -86,93 +100,51 @@ _.forEach(commands, function(command) {
       htpasswd:     args.htpasswd,
       secure:       args.secure,
       output:       args.output
-    }));
+    });
+    options[key] = { user: args.user, force: args.force }
   }
 
   // nginx configuration
   if ((args.user) && (args.output)) {
-    files.main.nginx = templates.main.nginx({
+    key = `${args.output}/nginx/nginx.conf`;
+    files[key] = templates.main.nginx({
       user:     args.user,
       error:    args.error,
       output:   args.output
     });
+    options[key] = { user: args.user, force: args.force }
   }
-  
+
   // Prepare to download certificate information
   if ((args.name) && (args.secure)) {
 
-    // Download certificate and key
-    files.cert[`${args.name}.pem`] = `${args.ca}/${args.name}.pem`;
-    files.cert[`${args.name}.key`] = `${args.ca}/${args.name}.key`;
+    // Server certificate/key
+    key = `${args.output}/certs/${args.name}.pem`;
+    files[key] = `${args.ca}/${args.name}.pem`;
+    options[key] = { user: args.user, force: args.force }
 
-    // Download CA certificate and CRL
-    files.cert[`ca.crt`]           = `${args.ca}/ca.crt`;
-    files.cert[`ca.crl`]           = `${args.ca}/ca.crl.pem`;
+    // CA certificate
+    key = `${args.output}/certs/ca.crt`;
+    files[key] = `${args.ca}/ca.crt`;
+    options[key] = { user: args.user, force: args.force }
+
+    // CA CRL
+    key = `${args.output}/certs/ca.crl`;
+    files[key] = `${args.ca}/ca.crl.pem`;
+    options[key] = { user: args.user, force: args.force }
   }
 
-  // Prepare credentials for htpasswd file
-  _.forEach(args.logins, function(password, username) {
-    files.login[username] = _.trim(exec(`openssl passwd -apr1 ${password}`, {silent:true}).output);
-  });
+  // Ensure log files exist
+  mkdir('-p', `${args.output}/log`);
+  exec(`cd ${args.output}/log && touch dnsmasq.log nginx.access.log nginx.error.log`, { silent: true });
+  if (options.user) {
+    exec(`chown -R ${args.user} ${args.output}/log`, { silent: true });
+    exec(`chgrp -R ${args.user} ${args.output}/log`, { silent: true });
+  }
 
 });
 
-// Prepare to write files
-var id = [files.name[0], crypto.createHash('sha1').update(files.name.toString()).digest('hex').substring(0,5)].join('.'),
-    output = files.output[0],
-    save = require('./save'),
-    options = { user: files.user[0], force: files.force[0] },
-    filename, data, url;
-
-// Save main dnsimple configuration
-filename = `${output}/dnsimple.sh`;
-data = files.main.dnsimple;
-save(filename, data, options);
-
-// Save dnsimple shell script
-filename = `${output}/dnsimple/${id}.dnsimple.sh`;
-data = _.uniq(files.dnsimple).join("\n");
-save(filename, data, options);
-
-// Save main dnsmasq configuration
-filename = `${output}/dnsmasq.conf`;
-data = files.main.dnsmasq;
-save(filename, data, options);
-
-// Save dnsmasq configuration
-filename = `${output}/dnsmasq/${id}.dnsmasq.conf`;
-data = _.uniq(files.dnsmasq).join("\n");
-save(filename, data, options);
-
-// Save main nginx configuration
-filename = `${output}/nginx.conf`;
-data = files.main.nginx;
-save(filename, data, options);
-
-// Save nginx configuration
-filename = `${output}/nginx/${id}.nginx.conf`;
-data = _.uniq(files.nginx).join("\n");
-save(filename, data, options);
-
-// Download certificates
-_.forEach(files.cert, function(url, filename) {
-  filename = `${output}/certs/${filename}`;
-  save(filename, url, options);
+// Write files
+_.forEach(files, function(data, filename) {
+  save(filename, data, options[filename] || {});
 });
-
-// Save .htpasswd file
-if (_.values(files.login).length) {
-  filename = `${output}/nginx/.htpasswd`;
-  data = _.map(files.login, (pass, name) => `${name}:${pass}`);
-  save(filename, data.join("\n"), options);
-}
-
-// Ensure log files exist
-mkdir('-p', `${output}/log`);
-exec(`touch ${output}/log/dnsmasq.log`, { silent: true });
-exec(`touch ${output}/log/nginx.access.log`, { silent: true });
-exec(`touch ${output}/log/nginx.error.log`, { silent: true });
-if (options.user) {
-  exec(`chown -R ${options.user} ${output}/log`, { silent: true });
-  exec(`chgrp -R ${options.user} ${output}/log`, { silent: true });
-}

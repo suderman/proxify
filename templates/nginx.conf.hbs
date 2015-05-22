@@ -14,7 +14,7 @@ server {
   ssl_stapling        on;
   ssl_stapling_verify on;
   ssl_certificate     {{{output}}}/certs/{{{name}}}.pem;
-  ssl_certificate_key {{{output}}}/certs/{{{name}}}.key;
+  ssl_certificate_key {{{output}}}/certs/{{{name}}}.pem;
   {{/if}}
 
   {{#if certify}}
@@ -26,15 +26,13 @@ server {
   set $authenticated FALSE;
 
   # Authenticate common names containing @subdomain.domain (site-specific)
-  set $authorized_common_name @{{{subdomain}}}.{{{domain}}};
-  set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
+  set $authentication_check "$ssl_client_s_dn_cn:@{{{subdomain}}}.{{{domain}}}";
   if ($authentication_check ~ "([^:]+):\1") {
     set $authenticated TRUE;
   }
 
   # Authenticate common names containing @domain (domain-wide)
-  set $authorized_common_name @{{{domain}}};
-  set $authentication_check "$ssl_client_s_dn_cn:$authorized_common_name";
+  set $authentication_check "$ssl_client_s_dn_cn:@{{{domain}}}";
   if ($authentication_check ~ "([^:]+):\1") {
     set $authenticated TRUE;
   }
@@ -80,7 +78,7 @@ server {
     {{#if htpasswd}}
     # HTTP Basic Access Authentication
     auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/nginx/.htpasswd;
+    auth_basic_user_file {{{output}}}/htpasswd/{{{id}}}.htpasswd;
     {{/if}}
   }
 
