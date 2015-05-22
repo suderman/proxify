@@ -1,5 +1,5 @@
-var fs = require('fs'),
-    path = require('path'),
+var fs = require('fs');
+var path = require('path'),
     hbs = require('handlebars'),
     colors = require('colors');
 

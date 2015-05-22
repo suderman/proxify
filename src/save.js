@@ -1,8 +1,8 @@
 var _ = require('lodash'),
-    fs = require('fs'),
     dirname = require("path").dirname,
     colors = require('colors'),
     request = require('sync-request');
+var fs = require('fs');
 require('shelljs/global');
 
 // Regular express for blank lines

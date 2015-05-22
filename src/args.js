@@ -1,6 +1,7 @@
 var _ = require('lodash'),
     request = require('sync-request'),
     colors = require('colors');
+require('shelljs/global');
 
 module.exports = function(command) {
 
@@ -55,7 +56,7 @@ module.exports = function(command) {
       var username = pair.split(':')[0];
       var password = pair.split(':')[1];
       if ((username !== '') && (password !== '')) {
-        args.passwords[username] = password;
+        args.passwords[username] = _.trim(exec(`openssl passwd -apr1 ${password}`, {silent:true}).output);
       }
     }
   });
@@ -93,9 +94,11 @@ module.exports = function(command) {
   if (_.endsWith(args.target, '.')) args.target += args.domain; 
 
   // Ensure listen port doesn't start with :colon
-  args.listen = _.map(args.listen.split(','), function(port) {
-    return (_.startsWith(port, ':')) ? port.split(':')[1] : port;
-  });
+  if (args.listen) {
+    args.listen = _.map(args.listen.split(','), function(port) {
+      return (_.startsWith(port, ':')) ? port.split(':')[1] : port;
+    });
+  }
 
   if (args.target) {
 
