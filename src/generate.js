@@ -94,11 +94,11 @@ module.exports = function(command, files, options) {
   }
 
   // Prepare to download certificate information
-  if ((args.name) && (args.secure)) {
+  if (args.secure) {
 
     // Server certificate/key
-    key = `${args.output}/certs/${args.name}.pem`;
-    files[key] = `${args.ca}/${args.name}.pem`;
+    key = `${args.output}/certs/${args.secure}.pem`;
+    files[key] = `${args.ca}/${args.secure}.pem`;
     options[key] = { user: args.user, force: args.force }
 
     // CA certificate
