@@ -11,7 +11,6 @@ module.exports = function(command) {
       .alias('o', 'OUTPUT').describe('o', 'Output directory, used in configuration').default('o', process.env.OUTPUT || process.cwd())
       .alias('u', 'USER').describe('u', 'User account running process').default('u', process.env.USER)
       .alias('c', 'CA').describe('c', 'Certificate Authority URL').default('c', process.env.CA || `${process.env.SERVER || '127.0.0.1'}:11443`)
-      .alias('e', 'ERROR').describe('e', 'Error pages URL').default('e', process.env.ERROR || `http://error.${process.env.DOMAIN || 'local'}`)
       .alias('p', 'PASSWORDS').describe('p', 'Comma-delimited name:password').default('p', process.env.PASSWORDS || `${process.env.USER}:${process.env.USER}`)
       .alias('n', 'DNSIMPLE').describe('n', 'email:key').default('n', process.env.DNSIMPLE)
       .alias('s', 'secure').describe('s', 'Create secure host & certificate').default('s', false)
@@ -34,7 +33,6 @@ module.exports = function(command) {
     server:        argv.i,
     user:          argv.u,
     router:        argv.t,
-    error:         argv.e,
     output:        argv.o,
     dnsimple:      argv.n || false,
     secure:        argv.s || false,
@@ -56,11 +54,6 @@ module.exports = function(command) {
     var targets = args.target.toString().split(',');
     args.target = targets[0];
     args.fallback = (targets[1]) ? targets[1] : false;
-  }
-
-  // Ensure ERROR starts with http protocol
-  if (!_.startsWith(args.error, 'http')) {
-    args.error = 'http://' + args.error;
   }
 
   // Expand dot

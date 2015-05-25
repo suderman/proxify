@@ -27,25 +27,14 @@ server {
 
   # Authenticate common names containing @subdomain.domain (site-specific)
   set $authentication_check "$ssl_client_s_dn_cn:@{{{subdomain}}}.{{{domain}}}";
-  if ($authentication_check ~ "([^:]+):\1") {
-    set $authenticated TRUE;
-  }
+  if ($authentication_check ~ "([^:]+):\1") { set $authenticated TRUE; }
 
   # Authenticate common names containing @domain (domain-wide)
   set $authentication_check "$ssl_client_s_dn_cn:@{{{domain}}}";
-  if ($authentication_check ~ "([^:]+):\1") {
-    set $authenticated TRUE;
-  }
+  if ($authentication_check ~ "([^:]+):\1") { set $authenticated TRUE; }
 
   # Ensure client has certificate
-  if ($ssl_client_verify = NONE) {
-    set $authenticated FALSE;
-  }
-
-  # Redirect trespassers
-  if ($authenticated = FALSE) {
-    return 303 {{{error}}}/403.html;
-  }
+  if ($ssl_client_verify = NONE) { set $authenticated FALSE; }
   {{/if}}
 
   {{#if redirect}}
@@ -54,12 +43,18 @@ server {
   {{else}}
 
   location / {
+    {{#if certify}}
+    # Redirect trespassers
+    if ($authenticated = FALSE) { return 403; }
+    {{/if}}
 
     {{#if directory}}
+    # Directory listing
     autoindex on;
     alias {{{directory}}};
 
     {{else}}
+    # Reverse proxy
     proxy_pass {{{target}}};
 
     proxy_http_version 1.1;
@@ -82,5 +77,21 @@ server {
     {{/if}}
   }
 
+  # Error pages
+  location @400 { try_files /400.html /error/400.html =400; }
+  location @401 { try_files /401.html /error/401.html =401; }
+  location @402 { try_files /402.html /error/402.html =402; }
+  location @403 { try_files /403.html /error/403.html =403; }
+  location @404 { try_files /404.html /error/404.html =404; }
+  location @405 { try_files /405.html /error/405.html =405; }
+  location @406 { try_files /406.html /error/406.html =406; }
+  location @408 { try_files /408.html /error/408.html =408; }
+  location @413 { try_files /413.html /error/413.html =413; }
+  location @414 { try_files /414.html /error/414.html =414; }
+  location @417 { try_files /417.html /error/417.html =417; }
+  location @500 { try_files /500.html /error/500.html =500; }
+  location @502 { try_files /502.html /error/502.html =502; }
+  location @503 { try_files /503.html /error/503.html =503; }
+  location @504 { try_files /504.html /error/504.html =504; }
   {{/if}}
 }

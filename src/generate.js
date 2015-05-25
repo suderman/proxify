@@ -73,7 +73,6 @@ module.exports = function(command, files, options) {
       domain:       args.domain,
       subdomain:    args.subdomain,
       redirect:     args.redirect,
-      error:        args.error,
       certify:      args.certify,
       htpasswd:     args.htpasswd,
       secure:       args.secure,
@@ -87,7 +86,6 @@ module.exports = function(command, files, options) {
     key = `${args.output}/nginx/nginx.conf`;
     files[key] = templates.main.nginx({
       user:     args.user,
-      error:    args.error,
       output:   args.output
     });
     options[key] = { user: args.user, force: args.force }
