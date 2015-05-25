@@ -1,5 +1,5 @@
 # proxify
-Generate nginx &amp; dnsmasq configuration, plus .htpasswd, ssl certificates, &amp; dnsimple shell scripts for your reverse proxy
+Generate nginx &amp; dnsmasq configuration, plus .passwd, ssl certificates, &amp; dnsimple shell scripts for your reverse proxy
 
 ```
 Usage: proxify (<hostname> | <file>) [:listen] [:target] [--options]...

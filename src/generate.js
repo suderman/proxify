@@ -61,9 +61,9 @@ module.exports = function(command, files, options) {
     options[key] = { user: args.user, force: args.force }
   }
 
-  // htpasswd file
-  if ((args.htpasswd) && (args.logins) && (args.name) && (args.listen)) {
-    key = `${args.output}/htpasswd/${args.name}.${args.listen.join('.')}.htpasswd`;
+  // passwd file
+  if ((args.passwd) && (args.logins) && (args.name) && (args.listen)) {
+    key = `${args.output}/passwd/${args.name}.${args.listen.join('.')}.passwd`;
     files[key] = _.map(args.logins, (password, username) => `${username}:${password}`).join("\n");
     options[key] = { user: args.user, force: args.force }
   }
@@ -82,7 +82,7 @@ module.exports = function(command, files, options) {
       subdomain:    args.subdomain,
       redirect:     args.redirect,
       certify:      args.certify,
-      htpasswd:     args.htpasswd,
+      passwd:       args.passwd,
       secure:       args.secure,
       output:       args.output
     });

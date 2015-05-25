@@ -45,8 +45,8 @@ function save(path, data, options) {
     fs.chmodSync(path, '755');
   }
 
-  // Protect key, pem and htpasswd files
-  if ((_.endsWith(path, '.key')) || (_.endsWith(path, '.pem')) || (_.endsWith(path, '.htpasswd'))) {
+  // Protect pem and passwd files
+  if ((_.endsWith(path, '.pem')) || (_.endsWith(path, '.passwd'))) {
     fs.chmodSync(path, '600');
   }
 }

@@ -34,7 +34,7 @@ module.exports = function(args, argv) {
       });
 
       // Determine if basic authentication should be used
-      args.htpasswd = (_.keys(args.logins).length) ? true : false;
+      args.passwd = (_.keys(args.logins).length) ? true : false;
     }
   }
 

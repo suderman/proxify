@@ -54,7 +54,7 @@ server {
     }
     {{/if}}
 
-    {{#if htpasswd}}
+    {{#if passwd}}
     {{#if fallback}}
     if ($http_authorization = "") {
       error_page 490 = @needauth;
@@ -63,7 +63,7 @@ server {
     {{/if}}
     # HTTP Basic Access Authentication
     auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/htpasswd/{{{id}}}.htpasswd;
+    auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
     {{/if}}
     {{#if fallback}}error_page 401 = {{{fallback}}};{{/if}}
 
@@ -90,10 +90,10 @@ server {
     {{/if}}
   }
   
-  {{#if htpasswd}}{{#if fallback}}
+  {{#if passwd}}{{#if fallback}}
   location @needauth {
     auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/htpasswd/{{{id}}}.htpasswd;
+    auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
   }
   {{/if}}{{/if}}
 
