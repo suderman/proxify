@@ -12,8 +12,8 @@ module.exports = function(args) {
     } else if (args.fallback == 'https:') {
       args.fallback = `https://${args.name}`;
 
-    // Fallback is missing protocol and this is a redirect, set to $scheme
-    } else if ((args.redirect) && (!_.startsWith(args.fallback, 'http:')) && (!_.startsWith(args.fallback, 'https:'))) {
+    // Fallback is missing protocol, set to $scheme
+    } else if ((!_.startsWith(args.fallback, 'http:')) && (!_.startsWith(args.fallback, 'https:'))) {
       args.fallback = `$scheme://${args.fallback}`;
 
     // Fallback is already URL, leave it alone
