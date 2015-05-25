@@ -54,6 +54,19 @@ server {
     }
     {{/if}}
 
+    {{#if htpasswd}}
+    {{#if fallback}}
+    if ($http_authorization = "") {
+      error_page 490 = @needauth;
+      return 490;
+    }
+    {{/if}}
+    # HTTP Basic Access Authentication
+    auth_basic "Restricted";
+    auth_basic_user_file {{{output}}}/htpasswd/{{{id}}}.htpasswd;
+    {{/if}}
+    {{#if fallback}}error_page 401 = {{{fallback}}};{{/if}}
+
     {{#if directory}}
     # Directory listing
     autoindex on;
@@ -75,13 +88,14 @@ server {
     proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
     proxy_set_header X-SSL-Client-S-CN $ssl_client_s_dn_cn;
     {{/if}}
-
-    {{#if htpasswd}}
-    # HTTP Basic Access Authentication
+  }
+  
+  {{#if htpasswd}}{{#if fallback}}
+  location @needauth {
     auth_basic "Restricted";
     auth_basic_user_file {{{output}}}/htpasswd/{{{id}}}.htpasswd;
-    {{/if}}
   }
+  {{/if}}{{/if}}
 
   # Error pages
   location @400 { try_files /400.html /error/400.html =400; }
