@@ -54,19 +54,6 @@ server {
     }
     {{/if}}
 
-    {{#if passwd}}
-    {{#if fallback}}
-    if ($http_authorization = "") {
-      error_page 490 = @needauth;
-      return 490;
-    }
-    {{/if}}
-    # HTTP Basic Access Authentication
-    auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
-    {{/if}}
-    {{#if fallback}}error_page 401 = {{{fallback}}};{{/if}}
-
     {{#if directory}}
     # Directory listing
     autoindex on;
@@ -90,11 +77,9 @@ server {
     {{/if}}
   }
   
-  {{#if passwd}}{{#if fallback}}
-  location @needauth {
-    auth_basic "Restricted";
-    auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
-  }
+  {{#if passwd}}
+  auth_basic "Restricted";
+  auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
   {{/if}}{{/if}}
 
   # Error pages
