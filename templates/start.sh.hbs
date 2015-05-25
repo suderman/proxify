@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+                                                                       
+# Run dnsimple scripts
+if [ -f {{{output}}}/dnsimple.sh ]; then
+  {{{output}}}/dnsimple.sh
+fi
+
+# Start up nginx
+if [ -f {{{output}}}/nginx.conf ]; then
+  nginx -p {{{output}}} -c {{{output}}}/nginx.conf
+fi
+
+# Start up dnsmasq
+if [ -f {{{output}}}/dnsmasq.conf ]; then
+  dnsmasq --conf-file={{{output}}}/dnsmasq.conf
+fi

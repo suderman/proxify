@@ -10,6 +10,13 @@ module.exports = function(command, files, options) {
   // Get args from command
   var args = require('./args')(command), key = '';
 
+  // start bash script
+  key = `${args.output}/start.sh`;
+  files[key] = templates.start({
+    output:   args.output
+  });
+  options[key] = { user: args.user, force: args.force }
+
   // dnsimple subdomain alias bash script
   if ((args.domain) && (args.subdomain) && (args.router) && (args.dnsimple)) {
     key = `${args.output}/dnsimple/${args.name}.dnsimple.sh`;
