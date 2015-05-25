@@ -76,6 +76,7 @@ module.exports = function(command, files, options) {
       name:         args.name,
       listen:       args.listen,
       target:       args.target,
+      fallback:     args.fallback,
       directory:    args.directory,
       domain:       args.domain,
       subdomain:    args.subdomain,

@@ -45,7 +45,13 @@ server {
   location / {
     {{#if certify}}
     # Redirect trespassers
-    if ($authenticated = FALSE) { return 403; }
+    if ($authenticated = FALSE) { 
+      {{#if fallback}}
+      return 303 {{{fallback}}};
+      {{else}}
+      return 403;
+      {{/if}}
+    }
     {{/if}}
 
     {{#if directory}}
