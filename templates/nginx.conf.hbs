@@ -75,13 +75,13 @@ server {
     proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
     proxy_set_header X-SSL-Client-S-CN $ssl_client_s_dn_cn;
     {{/if}}
-  }
   
-  {{#if passwd}}
-  # Ask for name and password
-  auth_basic "Restricted";
-  auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
-  {{/if}}
+    {{#if passwd}}
+    # HTTP Basic Access Authentication
+    auth_basic "Restricted";
+    auth_basic_user_file {{{output}}}/passwd/{{{id}}}.passwd;
+    {{/if}}
+  }
 
   # Error pages
   location @400 { try_files /400.html /error/400.html =400; }
