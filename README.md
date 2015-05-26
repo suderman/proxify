@@ -13,6 +13,7 @@ Options:
   -c, --CA            Certificate Authority URL         [default: "http://127.0.0.1:11443"]
   -p, --PASSWORDS     Comma-delimited name:password          [default: "www-data:www-data"]
   -n, --DNSIMPLE      email:key
+  -x, --nginx         Additional nginx configuration                       [default: false]
   -s, --secure        Create secure host & certificate                     [default: false]
   -a, --authenticate  Authenticate username or certificate                 [default: false]
   -r, --redirect      Redirect to target                                          [boolean]
