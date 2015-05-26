@@ -50,7 +50,7 @@ module.exports = function(command, files, options) {
   }
 
   // dnsmasq configuration
-  if ((args.user) && (args.domain) && (args.server) && (args.output)) {
+  if ((args.domain) && (args.server)) {
     key = `${args.output}/dnsmasq.conf`;
     files[key] = templates.main.dnsmasq({
       user:     args.user,
