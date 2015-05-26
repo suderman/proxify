@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var fs = require('fs');
+var parse = require('shell-quote').parse;
 
 // Build commands
 var argv = require('yargs').boolean(['s','a','r']).argv;
@@ -9,7 +10,7 @@ try {
   var lines = fs.readFileSync(argv._[0], 'utf8').split("\n");
   _.forEach(lines, function(line) {
     line = _.trim(line);
-    if (line) commands.push(line.split(/\s+/));
+    if (line) commands.push(parse(line));
   });
 
 } catch (e) {
