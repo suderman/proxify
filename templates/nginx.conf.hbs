@@ -43,6 +43,8 @@ server {
   {{else}}
 
   location / {
+    {{{nginx}}}
+
     {{#if certify}}
     # Redirect trespassers
     if ($authenticated = FALSE) { 

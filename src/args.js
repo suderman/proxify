@@ -13,6 +13,7 @@ module.exports = function(command) {
       .alias('c', 'CA').describe('c', 'Certificate Authority URL').default('c', process.env.CA || `${process.env.SERVER || '127.0.0.1'}:11443`)
       .alias('p', 'PASSWORDS').describe('p', 'Comma-delimited name:password').default('p', process.env.PASSWORDS || `${process.env.USER}:${process.env.USER}`)
       .alias('n', 'DNSIMPLE').describe('n', 'email:key').default('n', process.env.DNSIMPLE)
+      .alias('x', 'nginx').describe('x', 'Additional nginx configuration').default('x', false)
       .alias('s', 'secure').describe('s', 'Create secure host & certificate').default('s', false)
       .alias('a', 'authenticate').describe('a', 'Authenticate username or certificate').default('a', false)
       .alias('r', 'redirect').describe('r', 'Redirect to target').boolean('r')
@@ -34,6 +35,7 @@ module.exports = function(command) {
     user:          argv.u,
     router:        argv.t,
     output:        argv.o,
+    nginx:         argv.x || '',
     dnsimple:      argv.n || false,
     secure:        argv.s || false,
     authenticate:  argv.a || false,
