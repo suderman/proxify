@@ -13,8 +13,8 @@ server {
   ssl                 on;
   ssl_stapling        on;
   ssl_stapling_verify on;
-  ssl_certificate     {{{output}}}/certs/{{{secure}}}.pem;
-  ssl_certificate_key {{{output}}}/certs/{{{secure}}}.pem;
+  ssl_certificate     {{{output}}}/certs/{{{secure}}}.crt;
+  ssl_certificate_key {{{output}}}/certs/{{{secure}}}.key;
   {{/if}}
 
   {{#if certify}}
