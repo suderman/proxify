@@ -1,5 +1,5 @@
 # proxify
-Generate nginx &amp; dnsmasq configuration, plus .passwd, ssl certificates, &amp; dnsimple shell scripts for your reverse proxy
+Generate nginx &amp; dnsmasq configuration, plus .passwd, ssl certificates, &amp; cloudflare/dnsimple shell scripts for your reverse proxy
 
 ```
 Usage: proxify (<hostname> | <file>) [:listen] [:target] [--options]...
@@ -12,6 +12,7 @@ Options:
   -u, --USER          User account running process                    [default: "www-data"]
   -c, --CA            Certificate Authority URL         [default: "http://127.0.0.1:11443"]
   -p, --PASSWORDS     Comma-delimited name:password          [default: "www-data:www-data"]
+  -l, --CLOUDFLARE    email:key
   -n, --DNSIMPLE      email:key
   -x, --nginx         Additional nginx configuration                       [default: false]
   -s, --secure        Create secure host & certificate                     [default: false]

@@ -17,9 +17,21 @@ module.exports = function(command, files, options) {
   });
   options[key] = { user: args.user, force: args.force }
 
+  // cloudflare subdomain alias bash script
+  if ((args.domain) && (args.subdomain) && (args.router) && (args.cloudflare)) {
+    key = `${args.output}/dns/${args.name}.cloudflare.sh`;
+    files[key] = templates.cloudflare({
+      domain:     args.domain,
+      subdomain:  args.subdomain,
+      router:     args.router,
+      cloudflare: args.cloudflare
+    });
+    options[key] = { user: args.user, force: args.force }
+  }
+
   // dnsimple subdomain alias bash script
   if ((args.domain) && (args.subdomain) && (args.router) && (args.dnsimple)) {
-    key = `${args.output}/dnsimple/${args.name}.dnsimple.sh`;
+    key = `${args.output}/dns/${args.name}.dnsimple.sh`;
     files[key] = templates.dnsimple({
       domain:     args.domain,
       subdomain:  args.subdomain,
@@ -29,10 +41,10 @@ module.exports = function(command, files, options) {
     options[key] = { user: args.user, force: args.force }
   }
 
-  // dnsimple main bash script
-  if ((args.domain) && (args.subdomain) && (args.router) && (args.dnsimple)) {
-    key = `${args.output}/dnsimple.sh`;
-    files[key] = templates.main.dnsimple({
+  // dns main bash script
+  if ((args.domain) && (args.subdomain) && (args.router) && ((args.cloudflare) || (args.dnsimple))) {
+    key = `${args.output}/dns.sh`;
+    files[key] = templates.main.dns({
       output:   args.output
     });
     options[key] = { user: args.user, force: args.force }

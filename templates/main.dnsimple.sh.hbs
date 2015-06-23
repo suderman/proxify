@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-for SCRIPT in {{{output}}}/dnsimple/*.sh; do
+for SCRIPT in {{{output}}}/dns/*.sh; do
   if [ -f $SCRIPT -a -x $SCRIPT ]; then
     $SCRIPT
   fi

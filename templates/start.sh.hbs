@@ -10,7 +10,7 @@ if [ -f {{{output}}}/dnsmasq.conf ]; then
   dnsmasq --conf-file={{{output}}}/dnsmasq.conf
 fi
 
-# Run dnsimple scripts
-if [ -f {{{output}}}/dnsimple.sh ]; then
-  {{{output}}}/dnsimple.sh
+# Run dns scripts
+if [ -f {{{output}}}/dns.sh ]; then
+  {{{output}}}/dns.sh
 fi
